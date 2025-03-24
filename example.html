@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AJAX PUT Request</title>
+</head>
+<body>
+
+    <h2>Update Data Using AJAX (PUT Request)</h2>
+    <button onclick="updateUser()">Update User</button>
+    <p id="response"></p>
+
+    <script>
+        function updateUser() {
+            let xhr = new XMLHttpRequest();
+            xhr.open("PUT", "https://jsonplaceholder.typicode.com/posts/1", true);
+            xhr.setRequestHeader("Content-Type", "application/json");
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === 4) {
+                    document.getElementById("response").innerText = xhr.responseText;
+                }
+            };
+
+            let data = JSON.stringify({ title: "Updated Title", body: "Updated Body", userId: 1 });
+
+            xhr.send(data);
+        }
+    </script>
+
+</body>
+</html>

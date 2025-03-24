@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Drag & Drop File Upload</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        #drop-area {
+            width: 300px;
+            height: 200px;
+            border: 2px dashed #ccc;
+            text-align: center;
+            padding: 50px;
+            font-family: Arial, sans-serif;
+        }
+        #drop-area.highlight {
+            border-color: green;
+        }
+    </style>
+</head>
+<body>
+
+    <h2>Drag & Drop File Upload</h2>
+    <div id="drop-area">
+        <p>Drag & drop your file here or click to select</p>
+        <input type="file" id="fileInput" hidden>
+    </div>
+    <p id="status"></p>
+
+    <script>
+        let dropArea = document.getElementById("drop-area");
+
+        // Prevent default behavior for drag events
+        ["dragenter", "dragover", "dragleave", "drop"].forEach(eventName => {
+            dropArea.addEventListener(eventName, preventDefaults, false);
+        });
+
+        function preventDefaults(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        // Highlight drop area when file is dragged over it
+        ["dragenter", "dragover"].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.add("highlight"), false);
+        });
+
+        ["dragleave", "drop"].forEach(eventName => {
+            dropArea.addEventListener(eventName, () => dropArea.classList.remove("highlight"), false);
+        });
+
+        // Handle file drop
+        dropArea.addEventListener("drop", function(e) {
+            let files = e.dataTransfer.files;
+            uploadFile(files[0]);
+        });
+
+        // Handle file selection via click
+        dropArea.addEventListener("click", function() {
+            document.getElementById("fileInput").click();
+        });
+
+        document.getElementById("fileInput").addEventListener("change", function(e) {
+            uploadFile(e.target.files[0]);
+        });
+
+        function uploadFile(file) {
+            if (!file) {
+                alert("No file selected!");
+                return;
+            }
+
+            let formData = new FormData();
+            formData.append("file", file);
+
+            let xhr = new XMLHttpRequest();
+            xhr.open("POST", "upload.php", true);
+
+            xhr.upload.onprogress = function(event) {
+                let percent = Math.round((event.loaded / event.total) * 100);
+                document.getElementById("status").innerText = "Uploading... " + percent + "%";
+            };
+
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    document.getElementById("status").innerText = "Upload complete!";
+                } else {
+                    document.getElementById("status").innerText = "Upload failed!";
+                }
+            };
+
+            xhr.send(formData);
+        }
+    </script>
+
+</body>
+</html>
